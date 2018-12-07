@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>新 全屏轮播</title>
+</head>
+<style type="text/css">
+*{ 
+  margin: 0; 
+  padding: 0;
+}
+.banner-wrapper{
+  position: relative;
+  height: 360px;
+  overflow: hidden;
+}
+
+.banner-list{
+  position: relative;
+  display: flex;
+  height: 100%;
+}
+.banner-item{
+  width: 100%;
+  flex: none;
+}
+
+.banner-dian{
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.banner-dian-switch{
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #F2EFE6;
+}
+.banner-dian-switch.active{
+  background-color: #E03636;
+}
+.banner-arrow{
+  position: absolute;
+  width: 50px;
+  height: 80px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #EDD0BE;
+  line-height: 80px;
+  text-align: center;
+  color: #666;
+  cursor: pointer;
+  opacity: 0;
+  transition: all .2s ease;
+}
+.banner-arrow:hover{
+  background-color: #c9e4ca;
+}
+.banner-arrow-left{
+  left: 100px;
+}
+.banner-arrow-right{
+  right: 100px;
+}
+.banner-wrapper:hover .banner-arrow{
+  opacity: 1;
+}
+	</style>
+<body>
+	
+	<div class="banner-wrapper">
+    <div class="banner-list">
+      <div class="banner-item" style="background-color: #bce784;"></div>
+      <div class="banner-item" style="background-color: #5dd39e;"></div>
+      <div class="banner-item" style="background-color: #348aa7;"></div>
+      <div class="banner-item" style="background-color: #525174;"></div>
+      <div class="banner-item" style="background-color: #513b56;"></div>
+    </div>
+    <div class="banner-dian">
+      <span class="banner-dian-switch active"></span>
+      <span class="banner-dian-switch"></span>
+      <span class="banner-dian-switch"></span>
+      <span class="banner-dian-switch"></span>
+      <span class="banner-dian-switch"></span>
+    </div>
+    <a class="banner-arrow banner-arrow-left" id="bannerPrev">&lt;</a>
+    <a class="banner-arrow banner-arrow-right" id="bannerNext">&gt;</a>
+</div>
+<!-- 脚本依赖jQuery -->
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+	<script type="text/javascript">
+		let tmp = {
+    data:{
+      bannerItemWidth:$('.banner-item').width(), // 当前容器宽度
+      bannerItemLength:$('.banner-item').length, // 重设前实际 数量 长度
+      bannerSpeed:500,                           // 动画速度   Speed(速度)
+      index:0,                                   // 当前第几个，默认第一项
+      isLock:false,                               // 锁，防止在滚动过程中再次触发 Lock(锁)
+    },
+    init:function(){
+      this.addItem(); // 添加项
+      this.bind();    // 绑定点击事件   bind(绑定)
+      console.log(tmp.data.bannerItemLength)
+    },
+    bind:function(){
+                    //.on()函数用于为指定元素的一个或多个事件绑定事件处理函数。
+      $('#bannerNext').on('click',this.bannerNext); // 点击下一个按钮  
+      $('#bannerPrev').on('click',this.bannerPrev); // 点击上一个按钮
+      $('.banner-dian-switch').on('click',this.bannerSwitch); // 点击切换按钮 下方圆点  switch(转换)
+      $(window).on('resize', this.resetSwipterWidth); // 页面宽度改变   resize(调整大小)
+    },
+    addItem:function(){
+      let bannerItemWidth  = this.data.bannerItemWidth; //获取一个项目的宽度
+      let bannerItemLength = this.data.bannerItemLength;   // 获取当前有几个项目
+      let bannerFirstItem  = $('.banner-item').eq(0).clone(); // 克隆第一个项目  Firs(第一)
+      let bannerLastItem   = $('.banner-item').eq(bannerItemLength - 1).clone(); // 克隆最后一个项目  Last（最后)
+                     //.append() 方法在被选元素的结尾（仍然在内部）插入指定内容
+      $('.banner-list').append(bannerFirstItem); // 把克隆的第一个项目添加到最后一项中 
+
+                    // .prepend()方法在被选元素的开头插入指定内容。
+      $('.banner-list').prepend(bannerLastItem); // 把克隆的最后一个项目添加到第一项中
+
+      // 重设偏移量，让页面展示第二个项目，为原来的第一项
+      $('.banner-list').css('left', - bannerItemWidth +'px'); //.css() 方法设置或返回被选元素的一个或多个样式属性。
+    },
+    //点击下一个按钮时
+    bannerNext:function(){
+      let next_index = tmp.data.index + 1;
+      tmp.gotoIndex(next_index);
+    },
+
+    // 点击上一个按钮
+    bannerPrev:function(){
+      let prev_index = tmp.data.index - 1;
+      tmp.gotoIndex(prev_index);
+    },
+    // 点击切换按钮
+    bannerSwitch:function(){
+      let this_index = $(this).index();
+      tmp.gotoIndex(this_index);
+    },
+    //页面发生重设
+    resetSwipterWidth:function(){//页面大小自适应
+      // 获取当前第几项
+      let active_index = tmp.data.index;
+      // 获取当前页面宽度
+      let bannerItemWidth = $('.banner-item').width();
+      // 重新计算偏移量
+      let translateX = (bannerItemWidth + bannerItemWidth * active_index)
+      // 设置改变偏移
+      $('.banner-list').animate({'left': - translateX +'px'},40)//animate() 方法执行 CSS 属性集的自定义动画。 px移动
+      
+      // 更新存储项目的宽度
+      tmp.data.bannerItemWidth = bannerItemWidth;
+    },
+
+    //页面切换
+    gotoIndex:function(index){//总攻
+      // 获取实际数组的长度
+      let bannerItemLength = tmp.data.bannerItemLength;
+      // 获取当前项目的宽度
+      let bannerItemWidth  = tmp.data.bannerItemWidth;
+      // 获取设置的动画速度
+      let bannerSpeed = tmp.data.bannerSpeed;
+      // 计算偏移量
+      let translateX = (bannerItemWidth + bannerItemWidth * index)
+      // 锁
+      let isLock = tmp.data.isLock;
+      if(isLock){
+        return
+      }else{
+        tmp.data.isLock = true;
+      }
+      let bannerListEle = $('.banner-list');
+      // 偏移动画
+      bannerListEle.animate({
+        'left': - translateX + 'px'
+      },
+      function(){
+        // 如果当前项目是 -1 ，第一项，就是展示的是我们克隆在最后一项的放在第一项的容器
+        // 通常在第 0 项的时候，点击上一个
+        if(index === -1){
+          // 这个时候其实用户是想去最后一项，我们把当前项目重设为最后一项
+          index = bannerItemLength -1 ;
+          // 瞬间改变页面偏移
+          // 因为是瞬间且展示的效果一样，所以用户不会察觉到
+          bannerListEle.css('left', - bannerItemWidth * bannerItemLength + 'px');
+          }
+          // 如果当前是最后一项
+          if(index === bannerItemLength){
+            // 实际用户是想去第 0 项
+            index = 0;
+            // 瞬间改变页面偏移
+            bannerListEle.css('left', - bannerItemWidth + 'px');
+          }
+          // 重设切换按钮的高亮位置
+          $('.banner-dian-switch').removeClass('active');//.removeClass() 方法从被选元素移除一个或多个类。
+          $('.banner-dian-switch').eq(index).addClass('active');//addClass() 方法向被选元素添加一个或多个类。
+          // 更新存储当前展示的位置
+          tmp.data.index  = index;
+          tmp.data.isLock = false;
+        });
+    },
+}
+
+tmp.init();    
+
+
+// let tmp = {
+  //     data:{
+  //       bannerItemWidth:$('.banner-item').width(),
+  //       bannerItemLength:$('.banner-item').length,
+  //       bannerSpeed:500,
+  //       index:0,
+  //       islock:false,
+  //     },
+  //     init:function(){
+  //       this.addItem();
+  //       this.bind();
+  //     },
+
+  //     bind:function(){
+  //       $('#bannerNext').on('click',this.bannerNext);
+  //       $('#bannerPrev').on('click',this.bannerPrev);
+  //       $('.banner-dian-switch').on('click',this.bannerSwitch);
+  //       $(window).on('resize', this.resetSwipterWidth);
+  //     },
+
+  //     addItem:function(){
+  //       let bannerItemWidth = this.data.bannerItemWidth;
+  //       let bannerItemLength = this.data.bannerItemLength;
+  //       let bannerFirstItem = $('.banner-item').eq(0).clone();
+  //       let bannerLastItem = $('.banner-item').eq(bannerItemLength -1).clone();
+  //       $('.banner-list').append(bannerFirstItem);
+  //       $('.banner-list').prepend(bannerLastItem);
+  //       $('.banner-list').css('left', - bannerItemWidth +'px');
+  //     },
+
+  //     bannerNext:function(){
+  //       let next_index = tmp.data.index + 1;
+  //       tmp.gotoIndex(next_index);
+  //     },
+  //     bannerPrev:function(){
+  //       let prev_index = tmp.data.index - 1;
+  //       tmp.gotoIndex(prev_index);
+  //     },
+  //     bannerSwitch:function(){
+  //       var this_index = $(this).index();
+  //       tmp.gotoIndex(this_index);
+  //     },
+  //     resetSwipterWidth:function(){
+  //       let active_index = tmp.data.index;
+  //       let bannerItemWidth = $('.banner-item').width();
+  //       let translateX = (bannerItemWidth + bannerItemWidth * active_index)
+  //       $('.banner-list').animate({'left': - translateX +'px'},40);
+  //       tmp.data.bannerItemWidth = bannerItemWidth;
+  //     },
+          
+  //     gotoIndex:function(index){
+  //       let active_index = tmp.data.index;
+  //       let bannerItemLength = tmp.data.bannerItemLength;
+  //       let bannerItemWidth = tmp.data.bannerItemWidth;
+  //       let bannerSpeed = tmp.data.bannerSpeed;
+  //       let translateX = (bannerItemWidth + bannerItemWidth * active_index)
+  //       console.log(translateX)
+  //       let isLock = tmp.data.isLock;
+  //       if(isLock){
+  //         return
+  //       }else{
+  //         tmp.data.isLock = true;
+  //       }
+  //       let bannerListEle = $('.banner-list');
+  //       bannerListEle.animate({
+  //         'left':- translateX +'px',
+  //       },
+  //       bannerSpeed,function(){
+  //         if(index === -1){
+  //           index = bannerItemLength -1;
+  //           bannerListEle.css('left',- bannerItemWidth * bannerItemLength + 'px');
+  //         }
+  //         if(index === bannerItemLength){
+  //           index = 0;
+  //           bannerListEle.css('left', - bannerItemWidth +'px')
+  //         }
+  //         $('.banner-dian-switch').removeClass('active');
+  //         $('.banner-dian-switch').eq(index).addClass('active');
+  //         tmp.data.index = index;
+  //         tmp.data.isLock = false;
+  //       });
+  //     }
+  //   }
+  //     tmp.init();                
+	</script>
+</body>
+</html>
+
+  

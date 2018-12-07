@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>单点头像轮播</title>
+</head>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>单点头像轮播</title>
+  <style type="text/css">
+    *{
+      margin: 0; 
+      padding: 0;
+      font-size: 0;
+    }
+    .banner-wrapper{
+      position: relative;
+      width: 50%;
+      height: 300px;
+      margin: 150px auto 0;
+      overflow: hidden;
+    }
+    .banner-list{
+      position: relative; 
+      width: 100%;    
+      height: 100%;
+      display: flex;
+    }
+    .banner-item{
+      flex: none;
+      width: 100%;
+      height: 100%;
+    }
+    .banner-dian{
+      position: absolute;    
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .banner-dian-switch{
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: #f2efe6;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    .banner-dian-switch:hover{
+      background-color: #fff;
+    }
+    .banner-dian-switch:last-child{
+      margin-right: 0;
+    }
+    .banner-dian-switch.active{
+      /*background-color: #E03636;*/
+      background-color: #da627d;
+    }
+    /*.banner-arrow{
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: #EDD0BE;
+      width: 50px;
+      height: 80px;
+      line-height: 80px;
+      font-size: 20px;
+      font-weight: 600;
+      text-align: center;
+      color: #666;
+      cursor: pointer;
+      transition: all .2s ease;
+      opacity: 0;
+    }
+     .banner-wrapper:hover .banner-arrow{
+      opacity: 1;
+    }
+    .banner-arrow:hover{
+      background-color: #c9e4ca;
+    }
+    .banner-arrow.left{
+      left: 100px;
+    }
+    .banner-arrow.right{
+      right: 100px;
+    }*/
+  </style>
+</head>
+<body>
+<div class="banner-wrapper">
+  <ul class="banner-list">
+    <li class="banner-item" style="background-color:  #bce784;"></li>
+    <li class="banner-item" style="background-color:  #5dd39e;"></li>
+    <li class="banner-item" style="background-color:  #348aa7;"></li>
+    <li class="banner-item" style="background-color:  #525174;"></li>
+    <li class="banner-item" style="background-color:  #513b56;"></li>
+  </ul>
+
+  <ul class="banner-dian">
+    <li class="banner-dian-switch active"></li>
+    <li class="banner-dian-switch"></li>
+    <li class="banner-dian-switch"></li>
+    <li class="banner-dian-switch"></li>
+    <li class="banner-dian-switch"></li>
+  </ul>
+ <!--  <div class="banner-arrow left" id="bannerPrev">上</div>
+  <div class="banner-arrow right" id="bannerNext">下</div> -->
+</div>
+
+
+
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+  <script type="text/javascript">
+    let tmp = {
+      data:{
+        bannerWidth:$('.banner-item').width(),
+        bannerLength:$('.banner-item').length,
+        bannerSpeed:500,
+        index:0,
+        isLook:false,
+      },
+      init:function(){
+        this.addItem();
+        this.bind(); 
+      },
+      bind:function(){
+       // $('#bannerPrev').on('click',this.bannerPrev);
+       // $('#bannerNext').on('click',this.bannerNext);
+       $('.banner-dian-switch').on('click',this.bannerDian);
+       $(window).on('resize',this.bannerWindow);      
+      },
+      addItem:function(){
+        let bannerWidth = this.data.bannerWidth;
+        let bannerLength = this.data.bannerLength;
+        // let bannerFirstItem = $('.banner-item').eq(0).clone();
+        // let bannerLastItem = $('.banner-item').eq(bannerLength - 1).clone();
+        // $('.banner-list').append(bannerFirstItem);
+        // $('.banner-list').prepend(bannerLastItem);
+        // $('.banner-list').css('left' ,- bannerWidth + 'px');
+      },
+      // bannerNext:function(){
+      //   let next_index = tmp.data.index +1;
+      //   tmp.gotoIndex(next_index);
+      // },
+      // bannerPrev:function(){
+      //   let Prev_index = tmp.data.index -1;
+      //   tmp.gotoIndex(Prev_index);
+      // },
+      bannerDian:function(){
+        let this_index = $(this).index();
+        tmp.gotoIndex(this_index);
+      },
+      bannerWindow:function(){
+        let index = tmp.data.index;
+        let bannerWidth = $('.banner-item').width();
+        let translateX = (bannerWidth + bannerWidth * index)
+        $('banner-list').animate({'left': - translateX + 'px'},40);
+        tmp.data.bannerWidth = bannerWidth;
+      },
+      gotoIndex:function(index){
+        let bannerWidth = tmp.data.bannerWidth;
+        let bannerLength = tmp.data.bannerLength;
+        let bannerSpeed = tmp.data.bannerSpeed;
+        let isLook = tmp.data.isLook;
+        let translateX = (bannerWidth + bannerWidth * index);
+        if(isLook){
+          return
+        }else{
+          tmp.data.isLook = true;
+        }
+        let bannerListEle = $('.banner-list');
+        bannerListEle.animate({'left': - translateX + 'px'},
+          function(){
+            if(index === -1){
+              bannerListEle.css('left', - bannerWidth * bannerLength + 'px');
+            }
+            if(index === bannerLength){
+              index = 0;
+              bannerListEle.css('left', - bannerWidth + 'px');
+            }
+            $('.banner-dian-switch').removeClass('active');
+            $('.banner-dian-switch').eq(index).addClass('active');
+            tmp.data.index = index;
+            tmp.data.isLook = false;
+          })
+      },
+    }
+     tmp.init();
+  </script>
+</body>
+</html>

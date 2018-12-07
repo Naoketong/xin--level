@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>第二个output数组</title>
+</head>
+<body>
+  // 需要实现的代码
+  <br> 
+  // 1. 如果 id 重复，去除 level 值小的一项
+  <br>
+  // 2. 属性 acitive 为 true 的项目排行靠前
+  <br>
+  // 3. 属性 acitive 相同时，level 高的靠前
+  <br>
+  // 4. 返回项目格式为 名称-等级 的字符串
+  <br>
+  // return ...
+
+  <br>
+
+  avaScript-4", "HTML-2", "CSS-3", "JQuery-1
+  
+	<script type="text/javascript">
+		const Stacks = [
+      {id: 1,name: 'JavaScript',level: 1,active: true},//去除
+      {id: 2,name: 'CSS',level: 3,active: false},//3
+      {id: 3,name: 'HTML',level: 2,active: true},//2
+      {id: 1,name: 'JavaScript',level: 4,active: true},//1
+      {id: 4,name: 'JQuery',level: 1,active: false},//4
+    ]//JavaScript HTML CSS JQuery
+  
+let tmp = [];
+Stacks.map( (item) => {
+  Stacks.map((im) => {
+    if(item.id == im.id && item.level < im.level){
+      Stacks.splice(item,1);
+    }
+  })
+});
+function output() {
+  Stacks.map((data) => {
+    Stacks.map((item) => {
+      if(data.active && item.active && data.level > item.level){
+        let xyt = data.name + "-" + data.level 
+        let xyt1 = item.name + "-" + item.level;
+        tmp.push(xyt,xyt1);
+        }
+      if( ! data.active &&  ! item.active && data.level < item.level){
+        let xyt = data.name + "-" + data.level;
+        let xyt1 = item.name + "-"  + item.level;
+        tmp.push(xyt1,xyt);
+        }
+      })
+    })
+
+  return tmp;
+}
+console.log(output(Stacks))
+    
+
+
+
+
+
+
+	</script>
+</body>
+</html>

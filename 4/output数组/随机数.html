@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>随机数</title>
+</head>
+<body>
+	<script type="text/javascript">
+		let arr = [];
+		for(let i=0;i<10;i++){
+			let mmp = {};
+			let x = Math.floor(Math.random()*(12-5)+5);
+			let y = Math.floor(Math.random()*(18-6)+12);
+			mmp['x'] = x;
+			mmp['y'] = y;
+			arr.push(mmp);
+		}
+		console.log(arr)
+	</script>
+</body>
+</html>
